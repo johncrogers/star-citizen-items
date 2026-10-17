@@ -339,12 +339,17 @@
     try { history.replaceState(null, "", url); } catch (e) { /* some browsers block this on file:// */ }
   }
 
+  let shownDetail = null;
   function render() {
     renderFilters();
     renderScope();
     renderChips();
     renderList();
     renderDetail();
+    if (state.selected !== shownDetail) {
+      $("detail").scrollTop = 0;
+      shownDetail = state.selected;
+    }
     renderPendingBanner($("pending"));
   }
 
@@ -374,6 +379,9 @@
     typing = setTimeout(() => { state.query = e.target.value; render(); saveQueryToUrl(); }, 120);
   });
   $("meta").textContent = `${fmt(items.length)} items · data for patch ${catalogMeta.patch || "?"} · gathered ${catalogMeta.gathered || "?"} · prices are crowdsourced, so check the date before you fly out`;
+  $("siteLinks").innerHTML = ((window.SITE || {}).links || [])
+    .map((l) => `<a href="${esc(l.href)}">${esc(l.label)} →</a>`)
+    .join("");
   $("filtersToggle").addEventListener("click", () => {
     panelOpen = !panelOpen;
     try { localStorage.setItem(PANEL_KEY, panelOpen ? "1" : "0"); } catch (e) { /* storage unavailable */ }
