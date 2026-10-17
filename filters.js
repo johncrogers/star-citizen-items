@@ -48,6 +48,8 @@
     { key: "rarity", aliases: [], label: "Rarity", get: (s) => s.rarity },
     { key: "event", aliases: [], label: "Event", get: (s) => s.event },
     { key: "name", aliases: [], label: "Name", get: (s) => s.name },
+    // UEX terminal code of a shop, e.g. code:TAMMA. The locations app links here with it.
+    { key: "code", aliases: ["terminal"], label: "Sold at shop", get: (s) => s.buy.map((b) => b.code).filter(Boolean), list: true },
   ];
 
   // is:/has: flags. Each maps to a test.
@@ -140,13 +142,20 @@
     if (t.kind === "num") ok = testNum(t, s);
     else if (t.kind === "flag") ok = t.field.test(s);
     else if (t.kind === "text") {
-      const v = String(t.field.get(s) || "").toLowerCase();
-      ok = t.field.exact ? v === t.value : v.includes(t.value);
+      if (t.field.list) ok = t.field.get(s).some((x) => x.toLowerCase() === t.value);
+      else {
+        const v = String(t.field.get(s) || "").toLowerCase();
+        ok = t.field.exact ? v === t.value : v.includes(t.value);
+      }
     } else ok = haystack.includes(t.value);
     return t.neg ? !ok : ok;
   }
 
-  const matches = (terms, s, haystack) => terms.every((t) => testTerm(t, s, haystack));
+  const matches = (terms, s, haystack) => {
+    const codes = terms.filter((t) => t.kind === "text" && t.field.key === "code" && !t.neg);
+    const rest = codes.length > 1 ? terms.filter((t) => !codes.includes(t)) : terms;
+    return (codes.length < 2 || codes.some((t) => testTerm(t, s, haystack))) && rest.every((t) => testTerm(t, s, haystack));
+  };
 
   // ── Editing the query from the panel ───────────────────────────────────────
   const quote = (v) => (/\s/.test(v) ? `"${v}"` : v);

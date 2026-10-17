@@ -15,6 +15,7 @@
   // Expand them back into plain records.
   const LOCS = window.ITEM_LOCATIONS || [];
   const DESCS = window.ITEM_DESCRIPTIONS || [];
+  const CODES = window.ITEM_LOCATION_CODES || [];
   const longDate = (d) => (d ? `20${String(d).slice(0, 2)}-${String(d).slice(2, 4)}-${String(d).slice(4, 6)}` : null);
   function longImage(img) {
     if (!img) return null;
@@ -34,6 +35,7 @@
       facts: r.facts || [],
       buy: (r.buy || []).map(([loc, price, date, src]) => ({
         location: LOCS[loc],
+        code: CODES[loc] || null,
         price,
         date: longDate(date),
         source: src === "c" ? "cstone" : "UEX",

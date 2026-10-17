@@ -5,6 +5,11 @@
     Owned, Wishlist, onChange, renderPendingBanner, ownedToggle, wishlistControl, thingsToKnow, tagClass,
   } = window.Gear;
   const Filters = window.ItemFilters;
+  const locationsHref = ((window.SITE || {}).links || []).find((l) => l.id === "locations")?.href;
+  const shopLink = (b) =>
+    locationsHref && b.code
+      ? `<a href="${esc(locationsHref)}#code:${encodeURIComponent(b.code)}" title="Where it is and how to get there">${esc(b.location)}</a>`
+      : esc(b.location);
   const catalogMeta = window.ITEM_CATALOG_META || {};
 
   const CATEGORY_ORDER = ["Weapons", "Attachments", "Armor", "Clothing", "Tools", "Medical & food"];
@@ -227,7 +232,7 @@
     if (!s.buy.length) return "";
     const best = bestPrice(s);
     const row = (b) =>
-      `<tr${b.price === best ? ' class="best"' : ""}><td>${esc(b.location)}</td><td class="num">${fmt(b.price)}</td><td class="num muted">${esc(b.date || "")}${b.source === "cstone" ? " <small>cstone</small>" : ""}</td></tr>`;
+      `<tr${b.price === best ? ' class="best"' : ""}><td>${shopLink(b)}</td><td class="num">${fmt(b.price)}</td><td class="num muted">${esc(b.date || "")}${b.source === "cstone" ? " <small>cstone</small>" : ""}</td></tr>`;
     const head = `<thead><tr><th>Shop</th><th class="num">aUEC</th><th class="num">Checked</th></tr></thead>`;
     const SHOW = 8;
     const first = s.buy.slice(0, SHOW).map(row).join("");
