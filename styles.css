@@ -439,3 +439,7 @@ button.wish-toggle:hover { border-color: var(--star); }
   .scope { overflow-x: auto; }
   .tab { white-space: nowrap; }
 }
+
+/* Names that link to the glossary: quiet until hovered. */
+a.lookup { color: inherit; text-decoration: underline dotted; text-underline-offset: 3px; }
+a.lookup:hover { color: var(--accent); }

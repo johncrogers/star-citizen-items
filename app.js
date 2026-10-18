@@ -6,6 +6,9 @@
   } = window.Gear;
   const Filters = window.ItemFilters;
   const locationsHref = ((window.SITE || {}).links || []).find((l) => l.id === "locations")?.href;
+  // Names link to their entry in the glossary app (it finds the entry by name).
+  const glossaryHref = ((window.SITE || {}).links || []).find((l) => l.id === "glossary")?.href;
+  const lookUp = (name) => (glossaryHref && name ? `<a class="lookup" href="${esc(glossaryHref)}#find/${encodeURIComponent(name)}" title="Look up ${esc(name)} in the glossary">${esc(name)}</a>` : esc(name));
   const shopLink = (b) =>
     locationsHref && b.code
       ? `<a href="${esc(locationsHref)}#code:${encodeURIComponent(b.code)}" title="Where it is and how to get there">${esc(b.location)}</a>`
@@ -124,7 +127,7 @@
       .join("");
   }
 
-  const subLine = (s) => [s.manufacturer, s.weight ? `${s.weight} ${s.type.toLowerCase()}` : s.type, s.weaponClass].filter(Boolean).map(esc).join(" · ");
+  const subLine = (s, linked) => [s.manufacturer && linked ? lookUp(s.manufacturer) : esc(s.manufacturer || ""), ...[s.weight ? `${s.weight} ${s.type.toLowerCase()}` : s.type, s.weaponClass].map((x) => esc(x || ""))].filter(Boolean).join(" · ");
 
   function renderList() {
     const list = filtered();
@@ -282,7 +285,7 @@
       <div class="detail-head">
         <div>
           <h2>${esc(s.name)}</h2>
-          <p class="sub">${subLine(s)}${s.category !== badgeCat ? ` · ${esc(s.category)}` : ""}</p>
+          <p class="sub">${subLine(s, true)}${s.category !== badgeCat ? ` · ${esc(s.category)}` : ""}</p>
         </div>
         <div class="badges">
           <span class="${tagClass(badgeCat)}">${esc(badgeCat)}</span>
@@ -441,7 +444,8 @@
   onChange(render);
 
   const initialQuery = new URLSearchParams(location.search).get("q");
-  if (initialQuery) state.query = $("search").value = initialQuery;
+  // A search link from another app (index.html?q=...) is about everything, not just my wishlist.
+  if (initialQuery) { state.query = $("search").value = initialQuery; if (state.scope === "wishlist") state.scope = "all"; }
   selectFromHash();
   render();
   if (location.hash) scrollToSelected();
