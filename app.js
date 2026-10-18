@@ -18,6 +18,7 @@
   const SCOPE_KEY = "sc-items-wishlist:scope";
   let savedScope = "all";
   try { savedScope = localStorage.getItem(SCOPE_KEY) || (Object.keys(Wishlist.all()).length ? "wishlist" : "all"); } catch (e) { /* storage unavailable */ }
+  if (savedScope === "temperature") savedScope = "all";
   const state = { scope: savedScope, query: "", category: "", availability: "", owned: "", sort: "list", selected: null };
 
   const $ = (id) => document.getElementById(id);
@@ -105,8 +106,9 @@
     $("scope").innerHTML = [
       ["wishlist", "My wishlist", wanted],
       ["all", "All items", items.length],
+      ["temperature", "Temperature", null],
     ]
-      .map(([k, label, n]) => `<button class="tab${state.scope === k ? " on" : ""}" data-scope="${k}">${label} <span>${fmt(n)}</span></button>`)
+      .map(([k, label, n]) => `<button class="tab${state.scope === k ? " on" : ""}" data-scope="${k}">${label}${n != null ? ` <span>${fmt(n)}</span>` : ""}</button>`)
       .join("");
   }
 
@@ -345,7 +347,17 @@
   }
 
   let shownDetail = null;
+  const tempMode = () => state.scope === "temperature";
   function render() {
+    document.body.classList.toggle("temp-mode", tempMode());
+    $("tempView").hidden = !tempMode();
+    if (tempMode()) {
+      renderScope();
+      TempView.render($("tempView"));
+      $("total").innerHTML = "";
+      renderPendingBanner($("pending"));
+      return;
+    }
     renderFilters();
     renderScope();
     renderChips();
@@ -366,8 +378,11 @@
 
   function selectFromHash() {
     const id = decodeURIComponent(location.hash.slice(1));
+    if (id === "temperature") return setScope("temperature");
     if (!id || !itemById.has(id)) return;
     state.selected = id;
+    // Opening an item from the temperature chart goes back to the list.
+    if (tempMode()) setScope(Wishlist.isWanted(id) ? "wishlist" : "all");
     // Linking to an item that isn't on the wishlist: show it in "All items" with filters cleared.
     if (state.scope === "wishlist" && !Wishlist.isWanted(id)) setScope("all");
     if (!filtered().some((s) => s.id === id)) {
@@ -406,8 +421,12 @@
     const btn = e.target.closest("button[data-scope]");
     if (!btn) return;
     setScope(btn.dataset.scope);
+    try { history.replaceState(null, "", btn.dataset.scope === "temperature" ? "#temperature" : location.pathname + location.search); } catch (err) { /* file:// */ }
     render();
   });
+  TempView.bind($("tempView"), render);
+  let resizeTimer;
+  window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (tempMode()) render(); }, 150); });
   $("categoryChips").addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-cat]");
     if (!btn) return;

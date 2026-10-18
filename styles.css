@@ -400,3 +400,42 @@ button.wish-toggle:hover { border-color: var(--star); }
   .detail { position: static; max-height: none; overflow: visible; }
   .total { text-align: left; }
 }
+
+/* ── Temperature coverage ──────────────────── */
+.temp-mode .toolbar, .temp-mode .filter-panel, .temp-mode .active-filters, .temp-mode .layout { display: none !important; }
+.temp-view { padding: 16px 24px 32px; }
+.temp-view[hidden] { display: none; }
+.cmp-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 4px 20px 18px; min-width: 0; position: relative; }
+.cmp-card h3 { margin: 18px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); margin: 6px 0 10px; }
+.tc-controls { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; font-size: 13px; color: var(--muted); }
+.tc-controls label { display: inline-flex; align-items: center; gap: 6px; }
+.tc-controls select, .tc-controls input { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 14px; }
+.tc-controls input { width: 72px; }
+.tc-summary { font-size: 15px; }
+.tc-plot { width: 100%; overflow: hidden; }
+.tc-svg { display: block; }
+.tc-grid { stroke: #222b36; stroke-width: 1; }
+.tc-grid.zero { stroke: #3a4552; }
+.tc-tick { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.tc-need { fill: rgba(57, 135, 229, 0.10); }
+.tc-need-edge { stroke: #3987e5; stroke-width: 1; stroke-dasharray: 3 3; }
+.tc-hit { fill: transparent; }
+.tc-row { cursor: pointer; outline: none; }
+.tc-row:hover .tc-hit, .tc-row:focus .tc-hit, .tc-row.open .tc-hit { fill: var(--panel-2); }
+.tc-label { fill: var(--text); font-size: 12px; }
+.tc-more { fill: var(--muted); }
+.tc-bar { fill: #4d5866; }
+.tc-row.covers .tc-bar { fill: #3987e5; }
+.tc-val { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.tc-key { display: inline-block; width: 14px; height: 8px; border-radius: 3px; background: #4d5866; margin-right: 6px; vertical-align: 0; }
+.tc-key.covers { background: #3987e5; }
+.tc-key.need { background: rgba(57, 135, 229, 0.25); border: 1px dashed #3987e5; }
+.tc-tip { position: absolute; z-index: 5; max-width: 340px; padding: 6px 10px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; font-size: 13px; pointer-events: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); }
+.tc-detail h4 { margin: 14px 0 0; font-size: 14px; }
+.tc-wanted { color: var(--star); }
+@media (max-width: 800px) {
+  .temp-view { padding-left: 16px; padding-right: 16px; }
+  .scope { overflow-x: auto; }
+  .tab { white-space: nowrap; }
+}
